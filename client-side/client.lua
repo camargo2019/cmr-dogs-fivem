@@ -97,6 +97,11 @@ RegisterCommand("dogsFunctions", function(source,args,rawCommand)
             exports["dynamic"]:AddButton("Desbugar", "Desbugar o dog", "cmr_dogs:desbug", "", "others", true)
             exports["dynamic"]:SubMenu("Outros", "Outras ações que podem te ajudar!", "others")
 
+            
+            exports["dynamic"]:AddButton("Entrar no veículo", "entrar no veículo, só usar em alguns casos.", "cmr_dogs:vehicles", dog_id.."-colocar", "vehicle", true)
+            exports["dynamic"]:AddButton("Sair do veículo", "sair do veículo, só usar em alguns casos.", "cmr_dogs:vehicles", dog_id.."-remover", "vehicle", true)
+            exports["dynamic"]:SubMenu("Veículo", "Entrar ou sair do veículo perto de você.", "vehicle")
+
 			exports["dynamic"]:openMenu()
         end
     end
@@ -145,6 +150,7 @@ AddEventHandler("cmr_dogs:animationsStop", function()
         local anim_name = getValidateDogModel(PlayerPedId())
         CMR.playAnim(false,{"creatures@"..anim_name.."@amb@world_dog_sitting@exit", "exit"}, false)
         Wait(500)
+        is_sit = false
     end
     CMR.stopAnim(false)
 end)
@@ -170,6 +176,9 @@ AddEventHandler("cmr_dogs:removeVehicle", function(vehicle)
 
     local nveh = NetToVeh(vehicle)
     TaskLeaveVehicle(PlayerPedId(), nveh, 16)
+    Wait(500)
+    local dogCoords = GetEntityCoords(PlayerPedId())
+    SetEntityCoords(PlayerPedId(), dogCoords)
     is_sit = false
 end)
 
@@ -185,8 +194,8 @@ end)
 RegisterNetEvent("hud:Voice")
 AddEventHandler("hud:Voice",function(Status)
     local anim_name = getValidateDogModel(PlayerPedId())
-    if anim_name and Status and not is_sit then
-        CMR.playAnim(false,{"creatures@"..anim_name.."@amb@world_dog_barking@base", "base_facial"}, false)
+    if anim_name and Status then
+        CMR.playAnim(true,{"creatures@"..anim_name.."@amb@world_dog_barking@base", "base_facial"}, false)
     else
         if not is_sit then
             CMR.stopAnim(false)
